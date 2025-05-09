@@ -52,4 +52,4 @@ def apply_smoking_effect_simple(image_np):
     lower_red = np.array([160, 50, 50])
     upper_red = np.array([180, 255, 255])
     mask = cv2.inRange(hsv, lower_red, upper_red)
-    image[mask
+    image[mask > 0] = image[mask > 0] * 0.7  # جعل الشفاه أغمق قلي
