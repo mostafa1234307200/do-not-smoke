@@ -32,4 +32,24 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # العنوان
-st.markdown("<h1 class='title'>مدرسة الأردن الأساسية المختلطة</h1>", unsafe_allow
+st.markdown("<h1 class='title'>مدرسة الأردن الأساسية المختلطة</h1>", unsafe_allow_html=True)
+st.markdown("<h3 class='title'>كيف سيبدو وجهك بعد 30 سنة من التدخين؟</h3>", unsafe_allow_html=True)
+
+# رفع الصورة
+st.markdown('<div class="upload-section">', unsafe_allow_html=True)
+uploaded_file = st.file_uploader("ارفع صورة (jpg أو png)", type=["jpg", "jpeg", "png"])
+st.markdown('</div>', unsafe_allow_html=True)
+
+# دالة التأثير البسيط
+def apply_smoking_effect_simple(image_np):
+    image = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+
+    # إضافة تأثير خفيف بتغيير التباين (زيادة اللمعان أو التدرج البسيط)
+    image = cv2.convertScaleAbs(image, alpha=1.2, beta=20)
+
+    # تعديل بسيط على لون الشفاه
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    lower_red = np.array([160, 50, 50])
+    upper_red = np.array([180, 255, 255])
+    mask = cv2.inRange(hsv, lower_red, upper_red)
+    image[mask
