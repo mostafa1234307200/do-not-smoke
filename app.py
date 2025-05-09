@@ -5,7 +5,9 @@ from PIL import Image
 
 st.set_page_config(page_title="مدرسة الأردن الأساسية المختلطة", layout="centered")
 
-st.markdown("""
+# تنسيق واجهة الموقع
+st.markdown(
+    """
     <style>
         .stApp {
             background-color: #f9fbe7;
@@ -21,3 +23,13 @@ st.markdown("""
             background-color: #f1f8e9;
             margin-top: 20px;
             text-align: center;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown("<h1 class='title'>مدرسة الأردن الأساسية المختلطة</h1>", unsafe_allow_html=True)
+st.markdown("<h3 class='title'>كيف سيبدو وجهك بعد 30 سنة من التدخين؟</h3>", unsafe_allow_html=True)
+
+st.markdown("<div
