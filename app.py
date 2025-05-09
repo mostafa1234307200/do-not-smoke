@@ -1,12 +1,12 @@
 import streamlit as st
 import numpy as np
 import cv2
-from PIL import Image
+import io
 
 # إعدادات الصفحة
 st.set_page_config(page_title="مدرسة الأردن الأساسية المختلطة", layout="centered")
 
-# تنسيق CSS
+# تصميم CSS
 st.markdown("""
     <style>
         .stApp {
@@ -36,22 +36,21 @@ uploaded_file = st.file_uploader("ارفع صورة (jpg أو png)", type=["jpg"
 camera_input = st.camera_input("أو التقط صورة بالكاميرا")
 st.markdown('</div>', unsafe_allow_html=True)
 
-# دالة التأثير (علامات شيخوخة بسيطة + تغيير الشفاه)
-def apply_smoking_effect(image_np):
+# دالة التأثير البسيط
+def apply_smoking_effect_simple(image_np):
     image = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
 
-    # تغييم بسيط حول العينين والفم
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Laplacian(gray, cv2.CV_8U, ksize=3)
-    edges_colored = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
-    aged = cv2.addWeighted(image, 0.92, edges_colored, 0.15, 0)
+    # إضافة تأثير خفيف بتغيير التباين (زيادة اللمعان أو التدرج البسيط)
+    image = cv2.convertScaleAbs(image, alpha=1.2, beta=20)
 
-    # تغميق الشفاه قليلاً
-    hsv = cv2.cvtColor(aged, cv2.COLOR_BGR2HSV)
-    lips_mask = cv2.inRange(hsv, (160, 50, 50), (180, 255, 255))
-    aged[lips_mask > 0] = aged[lips_mask > 0] * 0.5
+    # تعديل بسيط على لون الشفاه
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    lower_red = np.array([160, 50, 50])
+    upper_red = np.array([180, 255, 255])
+    mask = cv2.inRange(hsv, lower_red, upper_red)
+    image[mask > 0] = image[mask > 0] * 0.7  # جعل الشفاه أغمق قليلاً
 
-    result = cv2.cvtColor(aged, cv2.COLOR_BGR2RGB)
+    result = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     return result
 
 # المعالجة والعرض
@@ -66,5 +65,21 @@ if input_image:
 
     img_np = np.array(input_image)
     with st.spinner("تطبيق التأثير..."):
-        result_img = apply_smoking_effect(img_np)
+        result_img = apply_smoking_effect_simple(img_np)
         st.image(result_img, caption="بعد 30 سنة من التدخين", use_column_width=True)
+
+        # حفظ الصورة الناتجة كملف لاستخدامه لاحقًا
+        result_pil = Image.fromarray(result_img)
+
+        # تحويل الصورة إلى بايتات لتحميلها
+        img_byte_arr = io.BytesIO()
+        result_pil.save(img_byte_arr, format="PNG")
+        img_byte_arr.seek(0)
+
+        # زر لتحميل الصورة
+        st.download_button(
+            label="تحميل الصورة الناتجة",
+            data=img_byte_arr,
+            file_name="smoking_effect_image.png",
+            mime="image/png"
+        )
